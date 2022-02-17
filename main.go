@@ -16,7 +16,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	log.Info("start_service", zap.Any("config", cfg), zap.String("version", version.Version))
+	log.Info("start_service", zap.Any("config", cfg), zap.String("version", version.Version), zap.String("build_date", version.BuildDate))
 	ctx, cancel := context.WithCancel(context.Background())
 	n := ntp.NewNtp(cfg, log, ctx)
 	errCh := make(chan error)

@@ -10,6 +10,7 @@ type Config struct {
 	Service struct {
 		Name       string        `default:"ntp-service" json:"name"`
 		SyncPeriod time.Duration `default:"1m" json:"sync_period"`
+		Hosts      []string      `default:"time.apple.com,time.cloudflare.com,time.google.com,time.facebook.com" json:"hosts"`
 	} `json:"service"`
 	Zap struct {
 		//debug, info, warn, error, fatal, panic
