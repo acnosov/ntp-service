@@ -35,25 +35,24 @@ func (n *Ntp) SyncTime() error {
 	}
 	//n.log.Info("ntp_time", zap.Any("resp", ntpTime))
 
-	if ntpTime.ClockOffset > time.Millisecond || ntpTime.ClockOffset < -time.Millisecond {
-		err = SetSystemDate(ntpTime.Time.Add(ntpTime.RTT))
-		if err != nil {
-			return err
+	msg := "check_only"
+	if !n.cfg.Service.CheckOnly {
+		if ntpTime.ClockOffset > time.Millisecond || ntpTime.ClockOffset < -time.Millisecond {
+			err = SetSystemDate(ntpTime.Time.Add(ntpTime.RTT))
+			if err != nil {
+				return fmt.Errorf("SetSystemDate_error: %w", err)
+			}
+			msg = "time_synced"
+		} else {
+			msg = "time_ok"
 		}
-		n.log.Info("time_synced",
-			zap.Time("ntp", ntpTime.Time),
-			zap.Duration("offset", ntpTime.ClockOffset),
-			zap.Duration("rtt", ntpTime.RTT),
-			zap.Duration("elapsed", time.Since(start)),
-		)
-	} else {
-		n.log.Info("time_ok",
-			zap.Time("ntp", ntpTime.Time),
-			zap.Duration("offset", ntpTime.ClockOffset),
-			zap.Duration("rtt", ntpTime.RTT),
-			zap.Duration("elapsed", time.Since(start)),
-		)
 	}
+	n.log.Info(msg,
+		zap.Time("ntp", ntpTime.Time),
+		zap.Duration("offset", ntpTime.ClockOffset),
+		zap.Duration("rtt", ntpTime.RTT),
+		zap.Duration("elapsed", time.Since(start)),
+	)
 	return nil
 }
 func (n *Ntp) GetNtpTime() (ntpTime *ntp.Response, err error) {
